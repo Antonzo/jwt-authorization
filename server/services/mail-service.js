@@ -1,21 +1,22 @@
 const nodemailer = require('nodemailer');
+const googleService = require('../services/google-service');
 
 class MailService {
-    constructor() {
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            // secure: false,
-            // requireTLS: true,
+    async sendActivationMail(to, link) {
+        const googleAccessToken = await googleService.getNewAccessToken();
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
             auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD
+                type: "OAuth2",
+                user: process.env.GOOGLE_USER_EMAIL,
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+                accessToken: googleAccessToken,
             }
         })
-    }
-    async sendActivationMail(to, link) {
-        await this.transporter.sendMail({
-            from: process.env.SMTP_USER,
+        await transporter.sendMail({
+            from: process.env.GOOGLE_USER_EMAIL,
             to,
             subject: `Account activation on ${process.env.API_URL}`,
             text: '',
