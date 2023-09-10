@@ -70,3 +70,5 @@ storybook-static/
 
 # Nuxt.js build / generate output
 .nuxt
+
+.idea
