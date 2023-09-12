@@ -18,7 +18,7 @@ const LoginForm: FC = () => {
             />
             <input
                 onChange={e => setPassword(e.target.value)}
-                value={email}
+                value={password}
                 type="password"
                 placeholder="Password"
             />
