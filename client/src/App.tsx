@@ -1,9 +1,10 @@
 import React, {FC} from 'react';
+import LoginForm from "./components/LoginForm";
 
 const App: FC = () => {
     return (
         <div>
-        <h1>hello world</h1>
+            <LoginForm />
         </div>
     );
 }
