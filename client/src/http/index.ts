@@ -16,17 +16,19 @@ $api.interceptors.request.use((config) => {
 $api.interceptors.response.use((config) => {
     return config;
 }, async (error) => {
-        const originalRequest = error.config;
-        if (error.response.status === 401) {
-            try {
-                const response = await axios.get(`${API_URL}/refresh`, {withCredentials: true});
-                localStorage.setItem('token', response.data.accessToken);
-                return $api.request(originalRequest);
-            } catch (e) {
-                console.log('User is not authorized');
-            }
+    const originalRequest = error.config;
+    if (error.response.status === 401 && originalRequest && !originalRequest._isRetry) {
+        // avoid infinite loop
+        originalRequest._isRetry = true;
+        try {
+            const response = await axios.get(`${API_URL}/refresh`, {withCredentials: true});
+            localStorage.setItem('token', response.data.accessToken);
+            return $api.request(originalRequest);
+        } catch (e) {
+            console.log('User is not authorized');
         }
     }
-);
+    throw error;
+});
 
 export default $api;
