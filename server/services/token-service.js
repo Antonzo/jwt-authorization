@@ -34,15 +34,15 @@ class TokenService {
             tokenData.refreshToken = refreshToken;
             return tokenData.save();
         }
-        return await TokenModel.create({user: userId, refreshToken});
+        return (await TokenModel.create({user: userId, refreshToken}));
     }
 
     async removeToken(refreshToken) {
-        return await TokenModel.deleteOne({refreshToken});
+        return (await TokenModel.deleteOne({refreshToken}));
     }
 
     async findToken(refreshToken) {
-        return await TokenModel.findOne({refreshToken});
+        return (await TokenModel.findOne({refreshToken}));
     }
 }
 

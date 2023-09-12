@@ -57,7 +57,7 @@ class UserService {
     }
 
     async logout(refreshToken) {
-        return await tokenService.removeToken(refreshToken);
+        return (await tokenService.removeToken(refreshToken));
     }
 
     async refresh(refreshToken) {
@@ -80,6 +80,10 @@ class UserService {
             ...tokens,
             user: userDto
         }
+    }
+
+    async getAllUsers() {
+        return (await UserModel.find());
     }
 }
 
