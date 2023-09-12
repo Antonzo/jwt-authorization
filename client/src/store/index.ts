@@ -1,10 +1,14 @@
 import {IUser} from "../models/IUser";
 import {makeAutoObservable} from "mobx";
-import AuthService from "../service/AuthService";
+import AuthService from "../services/AuthService";
+import axios from "axios";
+import {API_URL} from "../http";
+import {IAuthResponse} from "../models/response/IAuthResponse";
 
 export default class Index {
     user = {} as IUser;
     isAuth = false;
+    isLoading = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -18,10 +22,13 @@ export default class Index {
         this.user = user
     }
 
+    setIsLoading(isLoading: boolean) {
+        this.isLoading = isLoading
+    }
+
     async login(email: string, password: string) {
         try {
             const response = await AuthService.login(email, password);
-            console.log("login: ", response)
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -33,7 +40,6 @@ export default class Index {
     async registration(email: string, password: string) {
         try {
             const response = await AuthService.registration(email, password);
-            console.log("registration: ", response)
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -45,12 +51,25 @@ export default class Index {
     async logout() {
         try {
             const response = await AuthService.logout();
-            console.log("logout: ", response)
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({} as IUser);
         } catch (e) {
             console.log(e);
+        }
+    }
+
+    async checkAuth() {
+        this.setIsLoading(true);
+        try {
+            const response = await axios.get<IAuthResponse>(`${API_URL}/refresh`, {withCredentials: true});
+            localStorage.setItem('token', response.data.accessToken);
+            this.setAuth(true);
+            this.setUser(response.data.user);
+        } catch (e) {
+            console.log(e);
+        } finally {
+            this.setIsLoading(false);
         }
     }
 }
